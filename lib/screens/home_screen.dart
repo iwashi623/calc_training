@@ -6,7 +6,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   List<DropdownMenuItem<int>> _menuItems = List();
   int _numberOfQuestion = 0;
 
@@ -15,13 +14,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     setMenuItems();
     _numberOfQuestion = _menuItems[0].value;
-
   }
 
   void setMenuItems() {
-    _menuItems.add(DropdownMenuItem(value: 10, child: Text("10"),));
-    _menuItems.add(DropdownMenuItem(value: 20, child: Text("20"),));
-    _menuItems.add(DropdownMenuItem(value: 30, child: Text("30"),));
+    _menuItems.add(DropdownMenuItem(
+      value: 10,
+      child: Text("10"),
+    ));
+    _menuItems.add(DropdownMenuItem(
+      value: 20,
+      child: Text("20"),
+    ));
+    _menuItems.add(DropdownMenuItem(
+      value: 30,
+      child: Text("30"),
+    ));
 
 //    _menuItems = [
 //      DropdownMenuItem(value: 10, child: Text("10"),),
@@ -52,16 +59,21 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: <Widget>[
                 Image.asset("assets/images/image_title.png"),
-                SizedBox(height: 20.0,),
+                SizedBox(
+                  height: 20.0,
+                ),
                 Text(
                   "問題数を選択し、「スタート」ボタンを押してください",
                   style: TextStyle(fontSize: 12.0),
                 ),
-                SizedBox(height: 100,),
+                SizedBox(
+                  height: 100,
+                ),
                 DropdownButton(
                   items: _menuItems,
                   value: _numberOfQuestion,
-                  onChanged: (selectedValue){
+                  onChanged: (selectedValue) {
+                    //↑↓名前のない関数の定義（他のところで使わないから名前はいらない）
                     setState(() {
                       _numberOfQuestion = selectedValue;
                     });
@@ -90,6 +102,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 }
