@@ -9,7 +9,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              Image.asset("assets/images/image_title.png"),
+              Text("問題数を選択し、「スタート」ボタンを押してください"),
+              //TODO
+              RaisedButton(
+                child: Text("スタート"),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
