@@ -1,3 +1,4 @@
+import 'package:calc_training/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -62,7 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20.0,
                 ),
-                Text(
+                const Text(
+                  //アプリの動作に左右されないものは、constにすると良い。（定義済みにする）
                   "問題数を選択し、「スタート」ボタンを押してください",
                   style: TextStyle(fontSize: 12.0),
                 ),
@@ -85,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.only(bottom: 30),
                     child: RaisedButton.icon(
                       color: Colors.brown,
-                      onPressed: () => print("ボタンの押したで〜"),
+                      onPressed: () => startTestScreen(context),
                       label: Text("スタート"),
                       icon: Icon(Icons.skip_next),
                       //↑マテリアルアイコンの挿入
@@ -101,5 +103,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  startTestScreen(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TestScreen(
+                  numberOfQuestions: _numberOfQuestion,
+                )));
   }
 }
