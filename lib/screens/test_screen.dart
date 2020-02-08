@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +34,14 @@ class _TestScreenState extends State<TestScreen> {
   Soundpool soundpool;
   int soundIdCorrect = 0;
   int soundIdInCorrect = 0;
+
+  bool isCalcButtonEnabled = false;
+  bool isAnswerCheckButtonEnabled = false;
+  bool isBackButtonEnabled = false;
+  bool isCorrectInCorrectImageEnabled = false;
+  bool isEndMessageEnabled = false;
+
+  bool isCorrect = false;
 
   @override
   void initState() {
@@ -231,7 +241,7 @@ class _TestScreenState extends State<TestScreen> {
       padding: const EdgeInsets.all(3.0),
       child: RaisedButton(
         color: Colors.brown,
-        onPressed: null,
+        onPressed: isCalcButtonEnabled ? () => inputAnswer(numString) : null,
         child: Text(numString, style: TextStyle(fontSize: 24.0)),
       ),
     );
@@ -244,7 +254,7 @@ class _TestScreenState extends State<TestScreen> {
         width: double.infinity,
         child: RaisedButton(
           color: Colors.brown,
-          onPressed: null,
+          onPressed: isCalcButtonEnabled ? () => answerCheck() : null,
           child: Text(
             "こたえあわせ",
             style: TextStyle(fontSize: 14.0),
@@ -260,7 +270,7 @@ class _TestScreenState extends State<TestScreen> {
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
-          onPressed: null,
+          onPressed: isBackButtonEnabled ? () => closeTestScreen() : null,
           child: Text(
             "もどる",
             style: TextStyle(fontSize: 14.0),
@@ -271,14 +281,137 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   Widget _correctIncorrectImage() {
-    return Center(child: Image.asset("assets/images/pic_correct.png"));
+    if (isCorrectInCorrectImageEnabled) {
+      if (isCorrect) {
+        return Center(child: Image.asset("assets/images/pic_correct.png"));
+      }
+      return Center(child: Image.asset("assets/images/pic_incorrect.png"));
+    } else {
+      return Container();
+    }
   }
 
   Widget _endMessage() {
-    return Center(
-      child: Text("テスト終了", style: TextStyle(fontSize: 60.0)),
-    );
+    if (isEndMessageEnabled) {
+      return Center(
+        child: Text("テスト終了", style: TextStyle(fontSize: 60.0)),
+      );
+    } else {
+      return Container();
+    }
   }
 
-  void setQuestion() {}
+  void setQuestion() {
+    isCalcButtonEnabled = true;
+    isAnswerCheckButtonEnabled = true;
+    isBackButtonEnabled = false;
+    isCorrectInCorrectImageEnabled = false;
+    isEndMessageEnabled = false;
+    answerString = "";
+
+
+
+    Random random = Random();
+    questionLeft = random.nextInt(100) + 1;
+    questionRight = random.nextInt(100) + 1;
+
+    if (random.nextInt(2) + 1 == 1) {
+      operator = "+";
+    } else {
+      operator = "-";
+    }
+
+    setState(() {});
+  }
+
+  inputAnswer(String numString) {
+    setState(() {
+      if (numString == "C") {
+        answerString = "";
+        return;
+      }
+      if (numString == "-") {
+        if (answerString == "") answerString = "-";
+        return;
+      }
+      if (numString == "0") {
+        if (answerString != "0" && answerString != "-")
+          answerString = answerString + numString;
+        return;
+      }
+      if (answerString == "0") {
+        answerString = numString;
+        return;
+      }
+      answerString = answerString + numString;
+    });
+
+    //普通のif文
+//    setState(() {
+//      if (numString == "C"){
+//        answerString = "";
+//      } else if (numString == "-"){
+//        if(answerString == "") answerString = "-";
+//      } else if (numString == "0"){
+//        if (answerString != "0" && answerString != "-")
+//          answerString = answerString + numString;
+//      } else if (answerString == "0"){
+//        answerString = numString;
+//      } else {
+//        answerString = answerString + numString;
+//      }
+//    });
+  }
+
+  answerCheck() {
+    if (answerString == "" || answerString == "-") {
+      return;
+    }
+
+    isCalcButtonEnabled = false;
+    isAnswerCheckButtonEnabled = false;
+    isBackButtonEnabled = false;
+    isCorrectInCorrectImageEnabled = true;
+    isEndMessageEnabled = false;
+
+    numberOfRemaining -= 1;
+
+    var myAnswer = int.parse(answerString).toInt();
+
+    var realAnswer = 0;
+    if (operator == "+") {
+      realAnswer = questionLeft + questionRight;
+    } else {
+      realAnswer = questionLeft - questionRight;
+    }
+
+    if (myAnswer == realAnswer) {
+      isCorrect = true;
+      soundpool.play(soundIdCorrect);
+      numberOfCorrect += 1;
+    } else {
+      isCorrect = false;
+      soundpool.play(soundIdInCorrect);
+    }
+
+    numberOfRate =
+        (numberOfCorrect / (widget.numberOfQuestions - numberOfRemaining) * 100)
+            .toInt();
+
+    if (numberOfRemaining == 0) {
+      isCalcButtonEnabled = false;
+      isAnswerCheckButtonEnabled = false;
+      isBackButtonEnabled = true;
+      isCorrectInCorrectImageEnabled = true;
+      isEndMessageEnabled = true;
+    } else {
+      Timer(Duration(seconds: 1),  () => setQuestion());
+    }
+
+    setState(() {});
+  }
+
+  closeTestScreen() {
+    Navigator.pop(context);
+  }
 }
